@@ -1,0 +1,11 @@
+{"utilisateurs": [
+    {"utilisateur":
+        {
+            "nom": "CHARIOT",
+            "prenom": "Jordan",
+            "email": "jordan.Chariot@gmail.com",
+            "password": "password",
+            "datenaissance": "23/12/1992"
+        }
+    }
+]}
