@@ -1,15 +1,20 @@
 const express = require('express');
 const app = express();
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose')
 const dotenv = require('dotenv');
 
 dotenv.config();
+mongoose.set("strictQuery", false);
+mongoose.connect(process.env.URIDEV, { useNewUrlParser: true })
 
-MongoClient.connect(url, function(err, db) {
-    if (err) throw err;
-    console.log("Database created!");
-    db.close();
-  });
+const db = mongoose.connection
+db.once('open', _ => {
+  console.log('Database connected:', process.env.URIDEV)
+})
+
+db.on('error', err => {
+  console.error('connection error:', err)
+})
 
 
 app.get('/', (req, res) => {
