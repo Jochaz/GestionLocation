@@ -1,11 +1,14 @@
-{"utilisateurs": [
-    {"utilisateur":
-        {
-            "nom": "CHARIOT",
-            "prenom": "Jordan",
-            "email": "jordan.Chariot@gmail.com",
-            "password": "password",
-            "datenaissance": "23/12/1992"
-        }
-    }
-]}
+{
+ "nom": "CHARIOT",    
+ "prenom": "Jordan",  
+ "email": "jordan.Chariot@gmail.com", 
+ "password": "password",  
+ "adresseLigne1": "5 rue rené fleutelot",    
+ "adresseLigne2": "",    
+ "adresseLigne3": "",    
+ "ville": "DIJON",    
+ "CP": "21000",    
+ "dateinscription": "18/01/2023",    
+ "telephonefixe": "",    
+ "telephoneport": "0626582236"  
+}
