@@ -1,6 +1,6 @@
-
  // grab the things we need
- var mongoose = require('mongoose');
+ const { Double } = require('mongodb');
+var mongoose = require('mongoose');
  var Schema = mongoose.Schema;
  
  // create a schema
@@ -15,8 +15,22 @@
      ville: String,
      CP: String,
      dateinscription: Date,
+     datenaissance: Date,
      telephonefixe: String,
-     telephoneport: String} )
+     telephoneport: String,
+     biens: [
+        {
+            id: Number,
+            adresseLigne1: String,
+            adresseLigne2: String,   
+            adresseLigne3: String,
+            ville: String,
+            CP: String,
+            surface: Double,
+            nbpiece: Number,
+            type: String,
+        }
+     ]} )
  
  // the schema is useless so far
  // we need to create a model using it

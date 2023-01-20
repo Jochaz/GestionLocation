@@ -21,27 +21,49 @@ function validRequest(req) {
 }
 
 app.post('/login', jsonParser , function (req, res)  {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!validRequest(req)) {
-    return res.status(403).send("Erreur d'authentification pour utiliser l'API");
+    if (!validRequest(req)) {
+      return res.status(403).send("Erreur d'authentification pour utiliser l'API");
+    }
+
+    utilisateurs.findOne(({email: email.toLowerCase()}), function(err, document) {
+      if (err) res.status(401).send("Erreur dans l'authentification de l'utilisateur.")
+      if (document) { 
+        bcrypt.compare(password, document.password, function(err, result) {
+          if (result){
+            res.status(200).send(document) 
+          } else {
+            res.status(401).send("Le mot de passe saisie est incorrect.");
+          }
+        })
+        
+      } else
+      { res.status(401).send("L''adresse email saisie est introuvable."); }
+    })
+  } catch (error) {
+    return res.status(500).send(error);
   }
-  
-  utilisateurs.findOne(({email: email.toLowerCase()}), function(err, document) {
-    if (err) res.status(401).send("Erreur dans l'authentification de l'utilisateur.")
-    if (document) { 
-      bcrypt.compare(password, document.password, function(err, result) {
-        if (result){
-          res.status(200).send(document) 
-        } else {
-          res.status(401).send("Le mot de passe saisie est incorrect.");
-        }
-      })
-      
-    } else
-    { res.status(401).send("L''adresse email saisie est introuvable."); }
-  })
 });
+
+app.get('/users', jsonParser, function(req, res) {
+  try {
+    const {id} = req.query;
+    if (!validRequest(req)) {
+      return res.status(403).send("Erreur d'authentification pour utiliser l'API");
+    }
+
+    utilisateurs.findById(id, function (err, document) {
+      if (err) return res.status(404).send("Aucun utilisateur n'a été trouvé.");
+      return res.status(200).send(document);
+    });
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
+
 
 app.listen(3000, () => {
   console.log('Serveur API Gestion location démarrer sur http://localhost:3000');
