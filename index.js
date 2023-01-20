@@ -85,7 +85,7 @@ app.post('/register', jsonParser, function(req, res) {
         bcrypt.hash(password, salt, function(err, hash) {
           if (err) return res.status(500).send(err);
           utilisateurs.create({nom: nom.toUpperCase(), 
-                               prenom: prenom.charAt(0).toUpperCase() + prenom.slice(1), 
+                               prenom: prenom.charAt(0).toUpperCase() + prenom.slice(1).toLowerCase(), 
                                email: email, 
                                password: hash,
                                adresseLigne1: '',
