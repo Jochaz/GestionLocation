@@ -3,7 +3,10 @@ const app = express();
 const mongoose = require('mongoose')
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const bcrypt = require("bcrypt")
 var utilisateurs = require('./Models/utilisateurs.js');
+
+
 
 dotenv.config();
 mongoose.set("strictQuery", false);
@@ -19,15 +22,24 @@ function validRequest(req) {
 
 app.post('/login', jsonParser , function (req, res)  {
   const { email, password } = req.body;
+
   if (!validRequest(req)) {
     return res.status(403).send("Erreur d'authentification pour utiliser l'API");
   }
-
-  utilisateurs.findOne(({email: email.toLowerCase(), password: password}), function(err, document) {
+  
+  utilisateurs.findOne(({email: email.toLowerCase()}), function(err, document) {
     if (err) res.status(401).send("Erreur dans l'authentification de l'utilisateur.")
-
-    if (document) { res.status(200).send(document) } else
-    { res.status(401).send('La combinaison "Adresse email" et "mot de passe" est incorrect.'); }
+    if (document) { 
+      bcrypt.compare(password, document.password, function(err, result) {
+        if (result){
+          res.status(200).send(document) 
+        } else {
+          res.status(401).send("Le mot de passe saisie est incorrect.");
+        }
+      })
+      
+    } else
+    { res.status(401).send("L''adresse email saisie est introuvable."); }
   })
 });
 
