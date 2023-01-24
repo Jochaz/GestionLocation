@@ -5,8 +5,9 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const bcrypt = require("bcrypt")
 var utilisateurs = require('./Models/utilisateurs.js');
+var cors = require('cors');
 
-
+app.use(cors());
 
 dotenv.config();
 mongoose.set("strictQuery", false);
@@ -24,24 +25,24 @@ function validRequest(req) {
 app.post('/login', jsonParser , function (req, res)  {
   try {
     const { email, password } = req.body;
-    if (!validRequest(req)) return res.status(403).send("Erreur d'authentification pour utiliser l'API.");
+    if (!validRequest(req)) return res.status(403).send({"erreur":"Erreur d'authentification pour utiliser l'API."});
 
     utilisateurs.findOne(({email: email.toLowerCase()}), function(err, document) {
-      if (err) res.status(401).send("Erreur dans l'authentification de l'utilisateur.")
+      if (err) res.status(401).send({"erreur":"Erreur dans l'authentification de l'utilisateur."})
       if (document) { 
         bcrypt.compare(password, document.password, function(err, result) {
           if (result){
-            res.status(200).send(document) 
+            res.status(200).send({"token":document._id}) 
           } else {
-            res.status(401).send("Le mot de passe saisie est incorrect.");
+            res.status(401).send({"erreur":"Le mot de passe saisie est incorrect."});
           }
         })
         
       } else
-      { res.status(401).send("L''adresse email saisie est introuvable."); }
+      { res.status(401).send({"erreur":"L''adresse email saisie est introuvable."}); }
     })
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({"erreur":error});
   }
 });
 
@@ -49,10 +50,10 @@ app.post('/login', jsonParser , function (req, res)  {
 app.get('/users', jsonParser, function(req, res) {
   try {
     const {id} = req.query;
-    if (!validRequest(req)) return res.status(403).send("Erreur d'authentification pour utiliser l'API.");
+    if (!validRequest(req)) return res.status(403).send({"erreur":"Erreur d'authentification pour utiliser l'API."});
 
     utilisateurs.findById(id, function (err, document) {
-      if (err) return res.status(404).send("Aucun utilisateur n'a été trouvé.");
+      if (err) return res.status(404).send({"erreur":"Aucun utilisateur n'a été trouvé."});
       return res.status(200).send(document);
     });
   } catch (error) {
@@ -66,24 +67,24 @@ app.post('/register', jsonParser, function(req, res) {
     const {email, password, passwordconfirm, nom, prenom} = req.body;
     const regularExpression = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
     
-    if (!validRequest(req)) return res.status(403).send("Erreur d'authentification pour utiliser l'API.");
+    if (!validRequest(req)) return res.status(403).send({"erreur":"Erreur d'authentification pour utiliser l'API."});
 
-    if (!(password === passwordconfirm)) return res.status(400).send("Vous devez saisir deux fois le même mot de passe.");
+    if (!(password === passwordconfirm)) return res.status(400).send({"erreur":"Vous devez saisir deux fois le même mot de passe."});
 
-    if (!email) return res.status(400).send("Vous devez saisir votre adresse email.");
-    if (!password) return res.status(400).send("Vous devez saisir votre mot de passe.");
-    if (!nom) return res.status(400).send("Vous devez saisir votre nom.");
-    if (!prenom) return res.status(400).send("Vous devez saisir votre prénom.");
+    if (!email) return res.status(400).send({"erreur":"Vous devez saisir votre adresse email."});
+    if (!password) return res.status(400).send({"erreur":"Vous devez saisir votre mot de passe."});
+    if (!nom) return res.status(400).send({"erreur":"Vous devez saisir votre nom."});
+    if (!prenom) return res.status(400).send({"erreur":"Vous devez saisir votre prénom."});
 
-    if (!regularExpression.test(password)) return res.status(400).send("Votre mot de passe doit contenir au moins 8 caractères, un caratère minuscule, un caractère majuscule et un caractère spécial (!@#$%^&*).");
+    if (!regularExpression.test(password)) return res.status(400).send({"erreur":"Votre mot de passe doit contenir au moins 8 caractères, un caratère minuscule, un caractère majuscule et un caractère spécial (!@#$%^&*)."});
     
     utilisateurs.findOne(({email: email.toLowerCase()}), function(err, document) {
-      if (document) return res.status(400).send("Cette adresse email est déjà utilisée.");
+      if (document) return res.status(400).send({"erreur":"Cette adresse email est déjà utilisée."});
 
       bcrypt.genSalt(10, (err, salt) => {
-        if (err) return res.status(500).send(err);
+        if (err) return res.status(500).send({"erreur":err.toString()});
         bcrypt.hash(password, salt, function(err, hash) {
-          if (err) return res.status(500).send(err);
+          if (err) return res.status(500).send({"erreur":err.toString()});
           utilisateurs.create({nom: nom.toUpperCase(), 
                                prenom: prenom.charAt(0).toUpperCase() + prenom.slice(1).toLowerCase(), 
                                email: email, 
@@ -97,14 +98,14 @@ app.post('/register', jsonParser, function(req, res) {
                                telephonefixe:'',
                                telephoneport: '',
                                biens: []}).then(
-                                res.status(201).send("Votre compte a bien été créé.")
+                                res.status(201).send({"msg":"Votre compte a bien été créé."})
                                );
 
         });
       })
     });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({"erreur":error.ToString()});
   }
 })
 
