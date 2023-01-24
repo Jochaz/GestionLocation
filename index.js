@@ -110,6 +110,6 @@ app.post('/register', jsonParser, function(req, res) {
 })
 
 
-app.listen(3000, () => {
-  console.log('Serveur API Gestion location démarrer sur http://localhost:3000');
+app.listen(process.env.PORTDEV, () => {
+  console.log('Serveur API Gestion location démarrer sur http://localhost:'+ process.env.PORTDEV);
 });
