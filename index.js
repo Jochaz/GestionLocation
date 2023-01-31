@@ -32,7 +32,7 @@ app.post('/login', jsonParser , function (req, res)  {
       if (document) { 
         bcrypt.compare(password, document.password, function(err, result) {
           if (result){
-            res.status(200).send({"token":document._id}) 
+            res.status(200).send({"token":document._id, "user": document}) 
           } else {
             res.status(401).send({"erreur":"Le mot de passe saisie est incorrect."});
           }
@@ -54,10 +54,36 @@ app.get('/users', jsonParser, function(req, res) {
 
     utilisateurs.findById(id, function (err, document) {
       if (err) return res.status(404).send({"erreur":"Aucun utilisateur n'a été trouvé."});
-      return res.status(200).send(document);
+      return res.status(200).send({"doc": document});
     });
   } catch (error) {
     return res.status(500).send(error);
+  }
+});
+
+//PUT USER (modif compte)
+app.put('/users', jsonParser , function (req, res)  {
+  try {
+    const { _id, telephoneport, telephonefixe, adresseLigne1, adresseLigne2, adresseLigne3, CP, ville } = req.body;
+    if (!validRequest(req)) return res.status(403).send({"erreur":"Erreur d'authentification pour utiliser l'API."});
+    console.log(req.body)
+    utilisateurs.findById(_id, function(err, document) {
+      if (err) res.status(401).send({"erreur":"Utilisateur introuvable."})
+      if (document) { 
+        document.adresseLigne1 = adresseLigne1;
+        document.adresseLigne2 = adresseLigne2;
+        document.adresseLigne3 = adresseLigne3;
+        document.CP = CP;
+        document.ville = ville;
+        document.telephoneport = telephoneport;
+        document.telephonefixe = telephonefixe;
+        document.save();
+        res.send({"message": "Les données ont été sauvegardées."})
+      } else
+      { res.status(401).send({"erreur":"L'utilisateur est introuvable."}); }
+    })
+  } catch (error) {
+    return res.status(500).send({"erreur":error});
   }
 });
 
@@ -97,6 +123,7 @@ app.post('/register', jsonParser, function(req, res) {
                                dateinscription: Date.now(),
                                telephonefixe:'',
                                telephoneport: '',
+                               mode_theme: 'light',
                                biens: []}).then(
                                 res.status(201).send({"msg":"Votre compte a bien été créé."})
                                );
