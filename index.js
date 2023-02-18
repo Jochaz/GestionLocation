@@ -136,6 +136,47 @@ app.post('/register', jsonParser, function(req, res) {
   }
 })
 
+//POST ADDBIEN 
+app.post('/addbien', jsonParser, function(req, res) {
+  try {
+    const {userid, address1, address2, address3, ville, cp, etage, residence,
+           type, surfacetotale, surfacehabitable, nbchambre, nbsdb, nbpiece, classeenergie, ges, prixachat, loyermensuel, dateacquisition} = req.body;   
+    if (!validRequest(req)) return res.status(403).send({"erreur":"Erreur d'authentification pour utiliser l'API."});
+
+    utilisateurs.findById(userid, function(err, document) {
+      if (err) return res.status(400).send({"erreur":"Erreur dans la récupération de l'utilisateur : " + err});
+
+      var nouveauBien = {
+        address1: address1,
+        address2: address2,
+        address3: address3,
+        ville: ville,
+        cp: cp,
+        etage: etage,
+        residence: residence,
+        type: type,
+        surfacetotale: surfacetotale,
+        surfacehabitable: surfacehabitable,
+        nbchambre: nbchambre,
+        nbsdb: nbsdb,
+        nbpiece: nbpiece,
+        classeenergie: classeenergie,
+        ges: ges,
+        prixachat: prixachat,
+        loyermensuel: loyermensuel,
+        dateacquisition: dateacquisition
+      }
+
+      utilisateurs.findByIdAndUpdate(userid, { $push: {biens: nouveauBien}}, function (err, message){
+        if (err) return res.status(500).send("Erreur lors de la sauvegarde du nouveau bien : " + err);
+        return res.status(201).send({"msg":'Le bien a été enregistré avec succès.'});
+      })
+      
+    });
+  } catch (error) {
+    return res.status(500).send({"erreur":error.ToString()});
+  }
+})
 
 app.listen(process.env.PORTDEV, () => {
   console.log('Serveur API Gestion location démarrer sur http://localhost:'+ process.env.PORTDEV);

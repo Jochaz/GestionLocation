@@ -1,7 +1,28 @@
  // grab the things we need
  const { Double } = require('mongodb');
-var mongoose = require('mongoose');
+ var mongoose = require('mongoose');
  var Schema = mongoose.Schema;
+
+ var bienSchema = new Schema({
+    address1: String,
+    address2: String,   
+    address3: String,
+    ville: String,
+    cp: String,
+    surfacetotale: String,
+    surfacehabitation: String,
+    etage: String,
+    residence: String,
+    nbpiece: String,
+    nbsdb: String,
+    nbchambre: String,
+    classeenergie: String,
+    ges: String,
+    loyermensuel: String,
+    prixachat: String,
+    type: String,
+    dateacquisition: String
+ })
  
  // create a schema
  var utilisateurSchema = new Schema({
@@ -18,19 +39,10 @@ var mongoose = require('mongoose');
      datenaissance: Date,
      telephonefixe: String,
      telephoneport: String,
-     biens: [
-        {
-            id: Number,
-            adresseLigne1: String,
-            adresseLigne2: String,   
-            adresseLigne3: String,
-            ville: String,
-            CP: String,
-            surface: Double,
-            nbpiece: Number,
-            type: String,
-        }
-     ]} )
+     biens: [bienSchema]
+ })
+
+
  
  // the schema is useless so far
  // we need to create a model using it
